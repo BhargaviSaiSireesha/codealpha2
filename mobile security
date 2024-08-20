@@ -1,0 +1,103 @@
+import os
+
+# Define the path for the decompiled directory
+decompiled_dir = "decompiled_apk"
+
+# Create the directory if it doesn't exist
+if not os.path.exists(decompiled_dir):
+    os.makedirs(decompiled_dir)
+    print(f"Directory '{decompiled_dir}' created.")
+else:
+    print(f"Directory '{decompiled_dir}' already exists.")
+import os
+
+# Set the path to your AndroidManifest.xml file
+manifest_path = "C:/Users/siree/OneDrive/Desktop/sireesha/AndroidManifest.xml"  # Change this to your actual file path
+
+# Check if the file exists
+if os.path.exists(manifest_path):
+    print(f"'{manifest_path}' found.")
+else:
+    print(f"'{manifest_path}' not found. Please check the path.")
+import xml.etree.ElementTree as ET
+
+# Parse the XML file
+try:
+    tree = ET.parse(manifest_path)
+    root = tree.getroot()
+    print(f"Root element: {root.tag}")
+
+    # Iterate over child elements
+    for child in root:
+        print(f"Child element: {child.tag}, Attributes: {child.attrib}")
+
+        # If you want to access specific elements like permissions:
+        if child.tag == 'uses-permission':
+            permission = child.attrib.get('{http://schemas.android.com/apk/res/android}name')
+            print(f"Permission: {permission}")
+except ET.ParseError as e:
+    print(f"Error parsing XML: {e}")
+# This part of the code would require running a network analysis tool like Burp Suite
+print("Analyzing network traffic at http://127.0.0.1:8080")
+# Implement network traffic analysis logic here
+# Summarize permissions in AndroidManifest.xml
+permissions = root.findall("uses-permission")
+for perm in permissions:
+    print(f"Permission: {perm.attrib['{http://schemas.android.com/apk/res/android}name']}")
+# Check if the application is debuggable
+application = root.find("application")
+if application is not None:
+    debuggable = application.attrib.get('{http://schemas.android.com/apk/res/android}debuggable')
+    if debuggable == 'true':
+        print("Application is debuggable.")
+    else:
+        print("Application is not debuggable.")
+else:
+    print("No application tag found.")
+import requests
+from bs4 import BeautifulSoup
+
+# Function to analyze network traffic
+def analyze_network_traffic(url):
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        for request in soup.find_all('request'):
+            print(f"Request to {request.url}")
+            if request.scheme == 'http':
+                print("Insecure communication: HTTP")
+    except requests.RequestException as e:
+        print(f"Error analyzing network traffic: {e}")
+
+# Call the function with the Burp Suite URL
+analyze_network_traffic('http://127.0.0.1:8080')
+# Example: Check if the app requests INTERNET permission
+for child in root.findall("uses-permission"):
+    permission = child.attrib.get('{http://schemas.android.com/apk/res/android}name')
+    if permission == 'android.permission.INTERNET':
+        print("INTERNET permission is requested.")
+
+# Example: Check if the app is debuggable (which could be a security risk)
+for child in root.findall("application"):
+    debuggable = child.attrib.get('{http://schemas.android.com/apk/res/android}debuggable')
+    if debuggable == 'true':
+        print("The app is set to be debuggable, which is a potential security risk.")
+# Save analysis results to a text file
+results_path = "C:/Users/siree/onedrive/desktop/sireesha/analysis_results.txt"  # Change this to your desired output path
+
+with open(results_path, "w") as file:
+    file.write(f"Root element: {root.tag}\n")
+    
+    for child in root:
+        file.write(f"Child element: {child.tag}, Attributes: {child.attrib}\n")
+        
+        if child.tag == 'uses-permission':
+            permission = child.attrib.get('{http://schemas.android.com/apk/res/android}name')
+            file.write(f"Permission: {permission}\n")
+        
+        if child.tag == 'application':
+            debuggable = child.attrib.get('{http://schemas.android.com/apk/res/android}debuggable')
+            if debuggable == 'true':
+                file.write("The app is set to be debuggable, which is a potential security risk.\n")
+
+print(f"Analysis results saved to '{results_path}'.")
